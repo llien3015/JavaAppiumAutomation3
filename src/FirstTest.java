@@ -1,6 +1,7 @@
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.AndroidDriver;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.By;
@@ -36,8 +37,21 @@ public class FirstTest {
     {
         driver.quit();
     }
+    // Задание 1
     @Test
-    public void firstTest()
+    public void test1() {
+
+        waitForElementAndClick(
+                By.xpath("//*[contains(@text, 'Search Wikipedia')]"),
+                "Cannot  find search Wikipedia input",
+                5
+        );
+
+        assertElementHasText(By.id("org.wikipedia:id/search_src_text"), "Search…", "We see unexpected title", 10);
+    }
+    // Задание 2
+   @Test
+    public void Test2()
     {
         waitForElementAndClick(
                 By.xpath("//*[contains(@text, 'Search Wikipedia')]"),
@@ -55,28 +69,25 @@ public class FirstTest {
                 "Cannot  find 'Object-oriented programming language' topic searching by 'Java'",
                 15
         );
-    }
-
-    @Test
-    public void testCancelSearch()
-    {
-        waitForElementAndClick(
-                By.id("org.wikipedia:id/search_container"),
-                "Cannot  find search Wikipedia input",
+        waitForElementPresent(
+                By.xpath("//*[@text='Island of Indonesia, Southeast Asia']"),
+                "Cannot  find 'Island of Indonesia, Southeast Asia' topic searching by 'Java'",
+                15
+        );
+        waitForElementAndClear(
+                By.id("org.wikipedia:id/search_src_text"),
+                "Cannot  find search field",
                 5
         );
-
-        /*waitForElementAndClick(
-                By.id("org.wikipedia:id/search_close_btn"),
-                "Cannot  find X to cancel search",
-                5
-        );*/
-        waitForElementNotPresent(
-                By.id("org.wikipedia:id/search_close_btn"),
-                " X is still present on the page",
-                30
+        waitForElementPresent(
+                By.id("org.wikipedia:id/search_src_text"),
+                "field is not empty",
+                15
         );
     }
+
+
+
     private WebElement waitForElementPresent(By by, String error_message, long timeoutInSeconds)
     {
         WebDriverWait wait = new WebDriverWait(driver, timeoutInSeconds);
@@ -88,6 +99,16 @@ public class FirstTest {
     private WebElement waitForElementPresent(By by, String error_message)
     {
         return waitForElementPresent(by, error_message, 5);
+    }
+
+
+    private WebElement assertElementHasText(By by, String expectedText, String errorMessage, long timeoutInSeconds)
+    {
+        WebDriverWait wait = new WebDriverWait(driver, timeoutInSeconds);
+        WebElement element = wait.until(ExpectedConditions.presenceOfElementLocated(by));
+        if (!element.getText().equals(expectedText))
+            throw new AssertionError(errorMessage);
+        return element;
     }
 
     private WebElement waitForElementAndClick(By by, String error_message, long timeoutInSeconds)
@@ -103,14 +124,12 @@ public class FirstTest {
         element.sendKeys(value);
         return element;
     }
-    private boolean waitForElementNotPresent(By by, String error_message, long timeoutInSeconds)
-    {
-        WebDriverWait wait = new WebDriverWait(driver, timeoutInSeconds);
-        wait.withMessage(error_message + "\n");
-        return wait.until(
-                ExpectedConditions.invisibilityOfElementLocated(by)
 
-        );
+    private WebElement waitForElementAndClear(By by, String error_message, long timeoutInSeconds)
+    {
+        WebElement element = waitForElementPresent(by,error_message, timeoutInSeconds);
+        element.clear();
+        return element;
 
     }
 }
